@@ -12,6 +12,8 @@ Mata Kuliah **Pemrosesan Teks**
 - M. Habiburrohman Al-Fathir (24031554145)
 - Muhammad Habib Nur Aiman (24031554152)
 
+---
+
 ## Preparing
 ### API KEY
 - `./01. Scraping/Scraping YouTube.ipynb` -> API Key YouTube (dari Google Cloud Console)
