@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Sentiment Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.2.2/wordcloud2.min.js"></script>
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>Crypto <span class="highlight">Sentiment</span> Dashboard</h1>
+            <p class="subtitle">Historical Sentiment Analisis dan KOL's Tracker</p>
+        </header>
+
+        <div class="filter-section card">
+            <div class="filter-group">
+                <label for="startDate">Start Date</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="filter-group">
+                <label for="endDate">End Date</label>
+                <input type="date" id="endDate">
+            </div>
+            <div class="filter-group">
+                <label for="sourceFilter">Source</label>
+                <select id="sourceFilter">
+                    <option value="All">All Sources</option>
+                    <option value="X">X (Twitter)</option>
+                    <option value="Youtube">Youtube</option>
+                </select>
+            </div>
+            <button id="applyFilterBtn" class="btn-primary">Apply Filter</button>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card sentiment-card">
+                <h2>Market Sentiment</h2>
+                <div class="gauge-container">
+                    <canvas id="sentimentGauge"></canvas>
+                    <div class="gauge-value" id="sentimentValue">--</div>
+                    <div class="gauge-label" id="sentimentLabel">Loading...</div>
+                </div>
+                <div class="sentiment-stats">
+                    <div class="stat-item positive">
+                        <span class="stat-label">Positive</span>
+                        <span class="stat-count" id="posCount">-</span>
+                    </div>
+                    <div class="stat-item neutral">
+                        <span class="stat-label">Neutral</span>
+                        <span class="stat-count" id="neuCount">-</span>
+                    </div>
+                    <div class="stat-item negative">
+                        <span class="stat-label">Negative</span>
+                        <span class="stat-count" id="negCount">-</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="card tweets-card">
+                <div class="card-header">
+                    <h2>Latest KOL Tweets</h2>
+                    <span class="live-indicator" id="tweetStatus">LIVE</span>
+                </div>
+                <div class="tweets-container" id="tweetsContainer">
+                    <div class="loading-text">Loading Tweets...</div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="container ngram-section">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-bar"></i> Word Cloud & Freq Analysis</h2>
+                <div class="filter-group" style="justify-content: end; display: flex; flex-direction: row !important; align-items: center; gap: 10px; min-width: auto;">
+                    <label for="ngramSize" style="margin-bottom: 0;">N-gram Size:</label>
+                    <input type="number" id="ngramSize" value="1" min="1" style="width: 70px; padding: 0.5rem;">
+                </div>
+            </div>
+            <div class="wordcloud-grid">
+                <div class="wordcloud-card positive">
+                    <h3>Positive</h3>
+                    <div id="wordcloud-positive" class="wordcloud-canvas" style="height: 250px;"></div>
+                    <div class="chart-container" style="height: 400px; margin-top: 2.5rem; width: 100%;">
+                        <canvas id="ngram-positive"></canvas>
+                    </div>
+                </div>
+                <div class="wordcloud-card neutral">
+                    <h3>Neutral</h3>
+                    <div id="wordcloud-neutral" class="wordcloud-canvas" style="height: 250px;"></div>
+                    <div class="chart-container" style="height: 400px; margin-top: 2.5rem; width: 100%;">
+                        <canvas id="ngram-neutral"></canvas>
+                    </div>
+                </div>
+                <div class="wordcloud-card negative">
+                    <h3>Negative</h3>
+                    <div id="wordcloud-negative" class="wordcloud-canvas" style="height: 250px;"></div>
+                    <div class="chart-container" style="height: 400px; margin-top: 2.5rem; width: 100%;">
+                        <canvas id="ngram-negative"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container news-section">
+            <div class="section-header">
+                <h2><i class="fas fa-newspaper"></i> Latest News</h2>
+                <div class="pagination-controls">
+                    <button id="prevNewsBtn" disabled><i class="fas fa-chevron-left"></i></button>
+                    <span id="newsPageIndicator">Page 1</span>
+                    <button id="nextNewsBtn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+            <div class="airdrop-container" id="newsContainer">
+                <div class="loading-text">Loading News...</div>
+            </div>
+        </div>
+
+        <div class="container articles-section">
+            <div class="section-header">
+                <h2><i class="fas fa-book-open"></i> Latest Articles</h2>
+                <div class="pagination-controls">
+                    <button id="prevArticleBtn" disabled><i class="fas fa-chevron-left"></i></button>
+                    <span id="articlePageIndicator">Page 1</span>
+                    <button id="nextArticleBtn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+            <div id="articleContainer" class="airdrop-container">
+                <div class="loading-text">Loading Articles...</div>
+            </div>
+        </div>
+
+        <div class="container airdrop-section">
+        <div class="section-header">
+            <h2><i class="fas fa-parachute-box"></i> Upcoming Airdrops</h2>
+            <div class="pagination-controls">
+                <button id="prevAirdropBtn" disabled><i class="fas fa-chevron-left"></i></button>
+                <span id="airdropPageIndicator">Page 1</span>
+                <button id="nextAirdropBtn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+        <div id="airdropContainer" class="airdrop-container">
+            <div class="loading-text">Loading Airdrops...</div>
+        </div>
+    </div>
+
+    <div class="container unlock-section">
+        <div class="section-header">
+            <h2><i class="fas fa-lock-open"></i> Upcoming Token Unlocks</h2>
+            <div class="pagination-controls">
+                <button id="prevUnlockBtn" disabled><i class="fas fa-chevron-left"></i></button>
+                <span id="unlockPageIndicator">Page 1</span>
+                <button id="nextUnlockBtn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+        <div id="unlockContainer" class="airdrop-container">
+            <div class="loading-text">Loading Token Unlocks...</div>
+        </div>
+    </div>
+        </section>
+    </div>
+
+    <div class="crypto-marquee-container">
+        <div class="crypto-marquee-content" id="cryptoMarquee">
+            <span class="loading-text">Loading Market Data...</span>
+        </div>
+    </div>
+        </main>
+    </div>
+
+    <!-- Modal HTML -->
+    <div class="modal-overlay" id="sampleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Samples</h3>
+                <button class="close-modal-btn" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="sampleList" class="sample-list">
+                    <div class="loading-text">Loading samples...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
