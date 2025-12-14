@@ -8,7 +8,7 @@ Mata Kuliah **Pemrosesan Teks**
 - Dr. Dian Handayani, M.Si.
 
 ## Anggota Kelompok
-- Bagus Arya Dwipangga (251155008)
+- Bagus Arya Dwipangga (1314623042)
 - M. Habiburrohman Al-Fathir (24031554145)
 - Muhammad Habib Nur Aiman (24031554152)
 
